@@ -8,7 +8,7 @@ export default function CreateProductForm() {
   const [price, setPrice] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [uploadedImageName, setUploadedImageName] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleImageChange = async (e) => {
@@ -37,7 +37,7 @@ export default function CreateProductForm() {
         },
       );
 
-      const { url, imageUrl } = await presignRes.json();
+      const { url, filename } = await presignRes.json();
 
       // STEP 2 → Upload to S3 immediately
       const uploadRes = await fetch(url, {
@@ -54,8 +54,8 @@ export default function CreateProductForm() {
 
       console.log("✅ Image uploaded to S3");
 
-      // Save image URL in state
-      setUploadedImageUrl(imageUrl);
+      // Save image filename in state
+      setUploadedImageName(filename);
     } catch (err) {
       console.error("❌ Upload Error:", err);
       alert("Image upload failed");
@@ -67,7 +67,7 @@ export default function CreateProductForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!uploadedImageUrl) {
+    if (!uploadedImageName) {
       alert("Image still uploading or not selected");
       return;
     }
@@ -84,7 +84,7 @@ export default function CreateProductForm() {
           productName,
           description,
           price,
-          imageUrl: uploadedImageUrl,
+          imageName: uploadedImageName,
         }),
       });
 

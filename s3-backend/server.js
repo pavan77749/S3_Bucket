@@ -60,28 +60,26 @@ app.post('/api/get-presigned-url', async (req, res) => {
         contentType: mime,
     });
 
-    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
-
-    res.json({ url, filename: fileName, imageUrl });
+    res.json({ url, filename: fileName });
 });
 
 app.post('/api/products', async (req, res) => {
-    const { productName, description, imageUrl , price } = req.body;
+    const { productName, description, imageName, price } = req.body;
 
-    if(!productName || !description || !imageUrl || !price) {
+    if(!productName || !description || !imageName || !price) {
         return res.status(400).json({ message: 'All fields are required' });
     }
 
     const newProduct = new Product({
         productName,
         description,
-        imageUrl,
+        imageName,
         price
     });
 
     await newProduct.save();
 
-    res.json({ message: 'Product created successfully', product: { productName, description, imageUrl , price } });
+    res.json({ message: 'Product created successfully', product: { productName, description, imageName, price } });
 
 });
 
