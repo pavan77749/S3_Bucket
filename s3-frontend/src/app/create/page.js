@@ -1,115 +1,158 @@
-import React from 'react'
+"use client";
+
+import React, { useState } from "react";
 
 export default function CreateProductForm() {
+  const [productName, setProductName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("Invalid file type");
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+
+      // STEP 1 → Get Presigned URL
+      const presignRes = await fetch(
+        "http://localhost:5000/api/get-presigned-url",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mime: file.type,
+          }),
+        },
+      );
+
+      const { url, imageUrl } = await presignRes.json();
+
+      // STEP 2 → Upload to S3 immediately
+      const uploadRes = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload failed");
+      }
+
+      console.log("✅ Image uploaded to S3");
+
+      // Save image URL in state
+      setUploadedImageUrl(imageUrl);
+    } catch (err) {
+      console.error("❌ Upload Error:", err);
+      alert("Image upload failed");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!uploadedImageUrl) {
+      alert("Image still uploading or not selected");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const productRes = await fetch("http://localhost:5000/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productName,
+          description,
+          price,
+          imageUrl: uploadedImageUrl,
+        }),
+      });
+
+      if (!productRes.ok) {
+        throw new Error("Failed to save product");
+      }
+
+      alert("Product saved successfully");
+    } catch (err) {
+      console.error(err);
+      alert("DB Save Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div
-        className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black"
-        >
-             <form
-      className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-2xl space-y-5"
-      noValidate
-    >
-      {/* Product Name */}
-      <div>
-        <label
-          htmlFor="productName"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Product Name <span className="text-red-500">*</span>
-        </label>
-
+    <div className="flex min-h-screen items-center justify-center bg-gray-900">
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-xl mx-auto p-6 bg-white shadow-md rounded-2xl space-y-5"
+      >
         <input
-          id="productName"
-          name="productName"
           type="text"
+          placeholder="Product Name"
           required
-          placeholder="Enter product name"
-          className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg
-          focus:outline-none focus:ring-2 focus:ring-indigo-500
-          focus:border-indigo-500 transition"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-500 text-black rounded-lg"
         />
-      </div>
-
-      {/* Description */}
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Description <span className="text-red-500">*</span>
-        </label>
 
         <textarea
-          id="description"
-          name="description"
           rows="4"
+          placeholder="Description"
           required
-          placeholder="Enter product description"
-          className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg
-          focus:outline-none focus:ring-2 focus:ring-indigo-500
-          focus:border-indigo-500 transition resize-none"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-500 text-black rounded-lg"
         />
-      </div>
-
-      {/* Image Upload */}
-      <div>
-        <label
-          htmlFor="image"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Product Image <span className="text-red-500">*</span>
-        </label>
 
         <input
-          id="image"
-          name="image"
           type="file"
           required
           accept="image/png, image/jpeg, image/jpg, image/webp"
-          className="block w-full text-sm text-gray-600
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-lg file:border-0
-          file:text-sm file:font-semibold
-          file:bg-indigo-50 file:text-indigo-700
-          hover:file:bg-indigo-100"
+          className="w-full px-4 py-2 border border-gray-500 text-black rounded-lg"
+          onChange={handleImageChange}
         />
-      </div>
-
-      {/* Price */}
-      <div>
-        <label
-          htmlFor="price"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Price (₹) <span className="text-red-500">*</span>
-        </label>
 
         <input
-          id="price"
-          name="price"
           type="number"
           required
-          min="0"
-          step="0.01"
-          inputMode="decimal"
-          placeholder="Enter product price"
-          className="w-full px-4 py-2 border text-black border-gray-300 rounded-lg
-          focus:outline-none focus:ring-2 focus:ring-indigo-500
-          focus:border-indigo-500 transition"
+          placeholder="Price"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-500 text-black rounded-lg"
         />
-      </div>
 
-      {/* Submit */}
-      <button
-        type="submit"
-        className="w-full bg-indigo-600 text-white py-2.5 rounded-lg
-        font-semibold hover:bg-indigo-700
-        focus:outline-none focus:ring-2 focus:ring-indigo-500
-        focus:ring-offset-2 transition"
-      >
-        Create Product
-      </button>
-    </form>
- </div>
+        <button
+          disabled={loading || uploadingImage}
+          className="w-full bg-indigo-600 text-white py-2 rounded-lg"
+        >
+          {uploadingImage
+            ? "Uploading Image..."
+            : loading
+              ? "Saving..."
+              : "Create Product"}
+        </button>
+      </form>
+    </div>
   );
 }
