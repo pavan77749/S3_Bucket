@@ -1,0 +1,23 @@
+{
+  "name": "s3-backend",
+  "version": "1.0.0",
+  "description": "This is learn about working of S3 bucket",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "author": "Pavan Gupta",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.996.0",
+    "@aws-sdk/s3-request-presigner": "^3.996.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.2.2",
+    "nodemon": "^3.1.14",
+    "uuid": "^13.0.0"
+  }
+}
