@@ -83,6 +83,11 @@ app.post('/api/products', async (req, res) => {
 
 });
 
+app.get('/api/products', async (req, res) => {
+    const products = await Product.find().sort({ createdAt: -1 });
+    res.json(products);
+});
+
 // Start the server
 app.listen(PORT, async () => {
   await connectDB();
