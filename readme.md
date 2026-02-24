@@ -1,10 +1,10 @@
-# ?? S3 + CloudFront Image Upload Demo
+#  S3 + CloudFront Image Upload Demo
 
 This project demonstrates a modern, scalable workflow for uploading product images directly to **AWS S3**, serving them efficiently through **AWS CloudFront CDN**, using a **Next.js frontend** and **Node.js/Express backend**.
 
 ---
 
-## ?? Features
+##  Features
 
 - **Direct-to-S3 Uploads**
   - Images are uploaded directly from the browser to S3 using pre-signed URLs
@@ -25,27 +25,28 @@ This project demonstrates a modern, scalable workflow for uploading product imag
 
 ---
 
-## ??? System Architecture
+##  System Architecture
 
-### ?? Upload Flow
-> 1. Frontend requests Pre-Signed URL ? Backend returns URL & UUID
+###  Upload Flow
+> 1. Frontend requests Pre-Signed URL  Backend returns URL & UUID
 > 2. Frontend uploads file to S3 using Pre-Signed URL
-> 3. Frontend sends metadata (Name, Price, UUID) to Backend ? Saved to MongoDB
+> 3. Frontend sends metadata (Name, Price, UUID) to Backend  Saved to MongoDB
 
-![Upload Architecture](./images/upload-architecture.png)
+<img width="1063" height="673" alt="image" src="https://github.com/user-attachments/assets/cdaa20e5-57c5-4a5d-a444-bfddb4774fd9" />
 
-### ?? Fetch Flow
-> 1. Frontend requests products ? Backend returns metadata
+
+###  Fetch Flow
+> 1. Frontend requests products  Backend returns metadata
 > 2. Frontend constructs image URL: `CloudFront_Domain + UUID`
 > 3. User sees image served from CloudFront Edge Location
 
-![Fetch Architecture](./images/fetch-architecture.png)
+<img width="1041" height="611" alt="image" src="https://github.com/user-attachments/assets/e946bd1b-ae97-4ed5-a164-0c176f512415" />
 
 ---
 
-## ?? Workflow Overview
+##  Workflow Overview
 
-### 1?? Request Pre-Signed Upload URL
+### 1 Request Pre-Signed Upload URL
 Frontend requests permission from backend to upload an image.
 Backend generates:
 - Unique filename (UUID)
@@ -63,14 +64,14 @@ Backend generates:
 **Response:**
 ```json
 {
-  "url": "https://s3.ap-south-1.amazonaws.com/bucket-name/uuid.jpg?Signature=...",
+  "url": "https://s3.ap-south-1.amazonaws.com/bucket-name/uuid.jpgSignature=...",
   "filename": "uuid.jpg"
 }
 ```
 
 ---
 
-### 2?? Upload Image Directly to S3
+### 2 Upload Image Directly to S3
 Frontend uploads image directly to AWS S3 using the pre-signed URL.
 Backend is **NOT** involved in this step.
 
@@ -86,7 +87,7 @@ Backend is **NOT** involved in this step.
 
 ---
 
-### 3?? Create Product Entry
+### 3 Create Product Entry
 After successful upload, frontend sends product details to backend.
 
 **API Call:** `POST /api/products`
@@ -114,7 +115,7 @@ Stores metadata in MongoDB:
 
 ---
 
-## ?? Fetching Products with CloudFront Images
+##  Fetching Products with CloudFront Images
 
 When fetching products, the backend dynamically constructs the image URL using the CloudFront domain.
 
@@ -128,7 +129,7 @@ const imageUrl = `https://${process.env.CLOUDFRONT_DOMAIN}/${imageName}`;
 
 ---
 
-## ?? API Endpoints
+##  API Endpoints
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
@@ -139,7 +140,7 @@ const imageUrl = `https://${process.env.CLOUDFRONT_DOMAIN}/${imageName}`;
 
 ---
 
-## ??? Environment Variables
+##  Environment Variables
 
 Configure these in `s3-backend/.env`:
 
@@ -156,7 +157,7 @@ CLOUDFRONT_URL=https://d12345abcdef.cloudfront.net
 
 ---
 
-## ?? Folder Structure
+##  Folder Structure
 
 ```
 s3-backend/
@@ -172,5 +173,5 @@ s3-frontend/
 
 ---
 
-## ?? License
+##  License
 MIT
