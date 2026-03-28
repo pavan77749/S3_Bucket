@@ -1,6 +1,6 @@
 #  S3 + CloudFront Image Upload Demo
 
-This project demonstrates a modern, scalable workflow for uploading product images directly to **AWS S3**, serving them efficiently through **AWS CloudFront CDN**, using a **Next.js frontend** and **Node.js/Express backend**.
+This project demonstrates a modern, scalable workflow for uploading product images directly to **AWS S3**, serving them efficiently through **AWS CloudFront CDN**, using a **Next.js frontend** and **Node.js/Express backend**
 
 ---
 
